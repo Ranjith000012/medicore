@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediCore — Patient Records System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">⚕</div>
+      <div>
+        <div class="logo-title">MEDICORE</div>
+        <div class="logo-sub">Patient Records System</div>
+      </div>
+    </div>
+    <div class="header-status">
+      <span class="status-dot"></span>
+      <span id="serverStatus">CONNECTING...</span>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav>
+    <button class="nav-btn active" onclick="showTab('dashboard')">
+      <span class="nav-icon">◈</span> DASHBOARD
+    </button>
+    <button class="nav-btn" onclick="showTab('register')">
+      <span class="nav-icon">✦</span> REGISTER
+    </button>
+    <button class="nav-btn" onclick="showTab('report')">
+      <span class="nav-icon">✚</span> ADD REPORT
+    </button>
+    <button class="nav-btn" onclick="showTab('search')">
+      <span class="nav-icon">◎</span> SEARCH
+    </button>
+    <button class="nav-btn" onclick="showTab('patients')">
+      <span class="nav-icon">◉</span> ALL PATIENTS
+    </button>
+  </nav>
+
+  <main>
+
+    <!-- DASHBOARD TAB -->
+    <div id="tab-dashboard" class="tab active">
+      <div class="section-title">SYSTEM OVERVIEW</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">👤</div>
+          <div class="stat-value" id="stat-patients">0</div>
+          <div class="stat-label">TOTAL PATIENTS</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🏥</div>
+          <div class="stat-value" id="stat-hospitals">0</div>
+          <div class="stat-label">HOSPITALS</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👨‍⚕️</div>
+          <div class="stat-value" id="stat-doctors">0</div>
+          <div class="stat-label">DOCTORS</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-value" id="stat-reports">0</div>
+          <div class="stat-label">TOTAL REPORTS</div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:2rem">QUICK SEARCH BY PHONE</div>
+      <div class="quick-search">
+        <input type="text" id="quickPhone" placeholder="Enter patient phone number..." class="input-field" />
+        <button class="btn-primary" onclick="quickSearch()">SCAN RECORDS</button>
+      </div>
+      <div id="quickResult"></div>
+    </div>
+
+    <!-- REGISTER TAB -->
+    <div id="tab-register" class="tab">
+      <div class="section-title">REGISTER NEW PATIENT</div>
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>FULL NAME *</label>
+            <input type="text" id="reg-name" class="input-field" placeholder="Patient full name"/>
+          </div>
+          <div class="form-group">
+            <label>PHONE NUMBER *</label>
+            <input type="text" id="reg-phone" class="input-field" placeholder="e.g. 9876543210"/>
+          </div>
+          <div class="form-group">
+            <label>AGE</label>
+            <input type="number" id="reg-age" class="input-field" placeholder="Age in years"/>
+          </div>
+          <div class="form-group">
+            <label>GENDER</label>
+            <select id="reg-gender" class="input-field">
+              <option value="">Select Gender</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>BLOOD GROUP</label>
+            <select id="reg-blood" class="input-field">
+              <option value="">Select Blood Group</option>
+              <option>A+</option><option>A-</option>
+              <option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option>
+              <option>O+</option><option>O-</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>ADDRESS</label>
+            <input type="text" id="reg-address" class="input-field" placeholder="Full address"/>
+          </div>
+          <div class="form-group">
+            <label>KNOWN ALLERGIES</label>
+            <input type="text" id="reg-allergies" class="input-field" placeholder="e.g. Penicillin, Dust"/>
+          </div>
+          <div class="form-group">
+            <label>EMERGENCY CONTACT NAME</label>
+            <input type="text" id="reg-ec-name" class="input-field" placeholder="Emergency contact name"/>
+          </div>
+          <div class="form-group">
+            <label>EMERGENCY CONTACT PHONE</label>
+            <input type="text" id="reg-ec-phone" class="input-field" placeholder="Emergency phone number"/>
+          </div>
+        </div>
+        <div class="form-footer">
+          <div class="auto-info">⚡ Registration timestamp captured automatically</div>
+          <button class="btn-primary" onclick="registerPatient()">REGISTER PATIENT</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD REPORT TAB -->
+    <div id="tab-report" class="tab">
+      <div class="section-title">ADD MEDICAL REPORT</div>
+      <div class="form-card">
+        <div class="phone-lookup">
+          <input type="text" id="rep-phone" class="input-field" placeholder="Enter patient phone to load info..."/>
+          <button class="btn-secondary" onclick="loadPatientForReport()">LOAD PATIENT</button>
+        </div>
+        <div id="rep-patient-info" class="patient-mini-card" style="display:none"></div>
+        <div class="form-grid" id="report-form-fields">
+          <div class="form-group">
+            <label>HOSPITAL NAME *</label>
+            <input type="text" id="rep-hospital" class="input-field" placeholder="Hospital name" list="hospital-list"/>
+            <datalist id="hospital-list"></datalist>
+          </div>
+          <div class="form-group">
+            <label>DOCTOR NAME *</label>
+            <input type="text" id="rep-doctor" class="input-field" placeholder="Doctor name" list="doctor-list"/>
+            <datalist id="doctor-list"></datalist>
+          </div>
+          <div class="form-group">
+            <label>VISIT DATE</label>
+            <input type="date" id="rep-date" class="input-field"/>
+          </div>
+          <div class="form-group">
+            <label>REPORT TYPE</label>
+            <select id="rep-type" class="input-field">
+              <option>General</option>
+              <option>Emergency</option>
+              <option>Follow-up</option>
+              <option>Surgery</option>
+              <option>Lab Test</option>
+              <option>Radiology</option>
+              <option>Dental</option>
+              <option>Ophthalmology</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label>DIAGNOSIS</label>
+            <textarea id="rep-diagnosis" class="input-field" rows="3" placeholder="Diagnosis details..."></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>PRESCRIPTION</label>
+            <textarea id="rep-prescription" class="input-field" rows="3" placeholder="Medicines and dosage..."></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>ADDITIONAL NOTES</label>
+            <textarea id="rep-notes" class="input-field" rows="2" placeholder="Any additional notes..."></textarea>
+          </div>
+        </div>
+        <div class="form-footer">
+          <div class="auto-info">⚡ Report timestamp captured automatically</div>
+          <button class="btn-primary" onclick="addReport()">SUBMIT REPORT</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEARCH TAB -->
+    <div id="tab-search" class="tab">
+      <div class="section-title">PATIENT RECORD LOOKUP</div>
+      <div class="search-bar">
+        <div class="search-input-wrap">
+          <span class="search-icon">◎</span>
+          <input type="text" id="search-phone" class="input-field search-input" placeholder="Enter phone number to retrieve full medical history..."/>
+        </div>
+        <button class="btn-primary" onclick="searchPatient()">RETRIEVE RECORDS</button>
+      </div>
+      <div id="search-result"></div>
+    </div>
+
+    <!-- ALL PATIENTS TAB -->
+    <div id="tab-patients" class="tab">
+      <div class="section-title">ALL REGISTERED PATIENTS</div>
+      <div class="table-wrap">
+        <table class="data-table" id="patients-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>NAME</th>
+              <th>PHONE</th>
+              <th>AGE</th>
+              <th>GENDER</th>
+              <th>BLOOD</th>
+              <th>REGISTERED</th>
+              <th>ACTION</th>
+            </tr>
+          </thead>
+          <tbody id="patients-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
